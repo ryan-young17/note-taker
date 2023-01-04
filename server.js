@@ -27,34 +27,19 @@ app.get('/api/notes', (req, res) => {
 
 app.post('/api/notes', (req, res) => {
     const { title, text } = req.body;
+    
+    const newNote = {
+        title,
+        text,
+        note_id: uuid(),
+    };
+    
+    notesData.push(newNote);
 
-    if (title && text) {
-        const newNote = {
-            title,
-            text,
-            note_id: uuid(),
-        };
-        const readNotes = fs.readFileSync(`./db/db.json`, 'utf8');
-        const parsedNotes = JSON.parse(readNotes);
+    fs.writeFile(`./db/db.json`, JSON.stringify(notesData), (err) =>
+        err ? console.error(err) : console.log(`Note for ${newNote.title} has been saved!`));
 
-        parsedNotes.push(newNote);
-
-        const reviewNotes = JSON.stringify(parsedNotes, null, 2);
-
-        fs.writeFile(`./db/db.json`, reviewNotes, (err) =>
-            err ? console.error(err) : console.log(`Note for ${newNote.title} has been written to JSON file`)
-        );
-
-        const response = {
-        status: 'success',
-        body: newNote,
-        };
-
-        console.log(response);
-        res.status(201).json(response);
-    } else {
-        res.status(500).json('Error in posting note');
-    }
+    res.json(newNote);
 });
 
 app.listen(PORT, () =>
