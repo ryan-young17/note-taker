@@ -1,10 +1,8 @@
 const express = require('express');
 const path = require('path');
 const fs = require('fs');
-const notesData = require('./db/db.json');
 const uuid = require('./helpers/uuid');
 
-// const PORT = 3001;
 const PORT = process.env.PORT || 3001;
 
 const app = express();
@@ -23,37 +21,35 @@ app.get('/notes', (req, res) => {
 });
 
 app.get('/api/notes', (req, res) => {
-    res.json(notesData)
+    console.info(`${req.method} request received for note`);
+    const data = fs.readFileSync('./db/db.json', 'utf8');
+    res.json(JSON.parse(data));
 });
 
 app.post('/api/notes', (req, res) => {
+    console.info(`${req.method} request received to add a note`);
     const { title, text } = req.body;
-    
-    const newNote = {
-        title,
-        text,
-        note_id: uuid(),
-    };
-    
-    notesData.push(newNote);
 
-    fs.writeFile(`./db/db.json`, JSON.stringify(notesData), (err) =>
-        err ? console.error(err) : console.log(`Note for ${newNote.title} has been saved!`));
-
-    res.json(newNote);
+    if (title && text) {
+        const newNote = {
+            title,
+            text,
+            note_id: uuid(),
+        };
+        fs.readFile('./db/db.json', 'utf8', (err, data) => {
+            if (err) {
+                console.error(err);
+            } else {
+                const parsedData = JSON.parse(data);
+                parsedData.push(newNote);
+                fs.writeFile('./db/db.json', JSON.stringify(parsedData), (err) =>
+                err ? console.error(err) : console.info(`\nData written to the file`));
+            }
+        });
+        res.json(`Note added successfully!`);
+    } else {
+        res.error('Error in adding the note');
+    }
 });
 
-app.listen(PORT, () =>
-  console.log(`App listening at http://localhost:${PORT}`)
-);
-
-// const express = require('express');
-// const PORT = process.env.PORT || 3001;
-
-// const app = express();
-
-// app.get('/', (req, res) => {
-//   res.send('Note Taker');
-// });
-
-// app.listen(PORT);
+app.listen(PORT, () => console.log(`App listening at http://localhost:${PORT}`));
