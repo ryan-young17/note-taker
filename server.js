@@ -4,7 +4,8 @@ const fs = require('fs');
 const notesData = require('./db/db.json');
 const uuid = require('./helpers/uuid');
 
-const PORT = 3001;
+// const PORT = 3001;
+const PORT = process.env.PORT || 3001;
 
 const app = express();
 
@@ -45,3 +46,14 @@ app.post('/api/notes', (req, res) => {
 app.listen(PORT, () =>
   console.log(`App listening at http://localhost:${PORT}`)
 );
+
+// const express = require('express');
+// const PORT = process.env.PORT || 3001;
+
+// const app = express();
+
+// app.get('/', (req, res) => {
+//   res.send('Note Taker');
+// });
+
+// app.listen(PORT);
