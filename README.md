@@ -1,4 +1,4 @@
-# Challenge 11 - Note Taker Application
+# Note Taker Application
 
 [Link to deployed application](https://whispering-beyond-64371.herokuapp.com/)
 
